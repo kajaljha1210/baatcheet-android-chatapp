@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">BaatCheet</string>
+    <string name="intro_heading">Welcome to</string>
+    <string name="app_intro">BaatCheet!</string>
+    <string name="intro_subheading">Connect with your loved ones, share every moment, and stay close — no matter where you are.</string>
+    <string name="app_description">🤝 Seamless Connections\n\n 🌐 Talk Anytime, Anywhere\n\n 🔔 Get Notified Instantly\n</string>
+    <string name="start_button">Get Started</string>
+    <string name="login">Login</string>
+    <string name="phone_placeholder">Enter your Number</string>
+    <string name="login_button">Login</string>
+    <string name="terms_and_conditions">By continuing, you agree to our Terms &amp; Conditions</string>
+    <string name="intro_image_desc">\nAppLogo\n</string>
+</resources>
