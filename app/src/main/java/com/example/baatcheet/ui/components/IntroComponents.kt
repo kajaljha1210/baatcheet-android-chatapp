@@ -115,7 +115,6 @@ fun AppButton(text: String, onClick: () -> Unit) {
             imageVector = Icons.Default.ArrowForward,
             contentDescription = "Start",
             modifier = Modifier.size(20.dp),
-            tint = Color.White
         )
 
     }
