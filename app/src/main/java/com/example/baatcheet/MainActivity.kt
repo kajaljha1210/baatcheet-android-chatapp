@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,11 +20,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.baatcheet.ui.theme.BaatCheetTheme
 import com.example.baatcheet.ui.theme.navigation.AppNavHost
 import com.example.baatcheet.ui.theme.navigation.NavigationItem
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -33,12 +37,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             BaatCheetTheme {
-                    AppNavHost(navController = rememberNavController())
+                AppNavHost(navController = rememberNavController())
 
             }
         }
     }
 }
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun GreetingPreview() {
@@ -47,8 +52,19 @@ fun GreetingPreview() {
 
     }
 }
+
+
 @Composable
-fun SplashScreen() {
+fun SplashScreen(navController: NavController) {
+
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.intro))
+
+    LaunchedEffect(Unit) {
+        delay(2000)
+        navController.navigate(NavigationItem.Intro.route) {
+            popUpTo(NavigationItem.Splash.route) { inclusive = true }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()

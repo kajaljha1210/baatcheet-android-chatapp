@@ -67,19 +67,20 @@ fun NormalText(text: String, align: TextAlign) {
 
 @Composable
 fun IntroAnim() {
-    val preloaderLottieComposition by rememberLottieComposition(
+
+    val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(
             R.raw.intro
         )
     )
 
     val preloaderProgress by animateLottieCompositionAsState(
-        preloaderLottieComposition, iterations = LottieConstants.IterateForever, isPlaying = true
+        composition, iterations = LottieConstants.IterateForever, isPlaying = true
     )
 
 
     LottieAnimation(
-        composition = preloaderLottieComposition,
+        composition = composition,
         progress = preloaderProgress,
         modifier = Modifier.height(400.dp)
     )

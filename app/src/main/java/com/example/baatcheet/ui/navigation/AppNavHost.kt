@@ -13,7 +13,7 @@ import com.example.baatcheet.ui.theme.screens.IntroScreen
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination: String = NavigationItem.Intro.route,
+    startDestination: String = NavigationItem.Splash.route,
 ) {
     NavHost(
         modifier = modifier,
@@ -21,7 +21,7 @@ fun AppNavHost(
         startDestination = startDestination
     ) {
         composable(NavigationItem.Splash.route) {
-            SplashScreen()
+            SplashScreen(navController)
         }
         composable(NavigationItem.Intro.route) {
             IntroScreen()
