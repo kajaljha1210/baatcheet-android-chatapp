@@ -1,6 +1,7 @@
 package com.example.baatcheet
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,8 +30,10 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.baatcheet.ui.theme.BaatCheetTheme
 import com.example.baatcheet.ui.theme.navigation.AppNavHost
 import com.example.baatcheet.ui.theme.navigation.NavigationItem
+import com.example.baatcheet.ui.utils.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -55,18 +59,31 @@ fun GreetingPreview() {
     }
 }
 
-
 @Composable
 fun SplashScreen(navController: NavController) {
-
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.intro))
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         delay(2000)
-        navController.navigate(NavigationItem.Intro.route) {
-            popUpTo(NavigationItem.Splash.route) { inclusive = true }
+
+        val isLoggedIn = SessionManager.isLoggedIn(context)
+        val isProfileDone = SessionManager.isProfileDone(context).first()
+        Log.d("Splash", "🔑 isLoggedIn = $isLoggedIn")
+
+        if (isLoggedIn) {
+            if (isProfileDone) {
+                navController.navigate(NavigationItem.Home.route)
+            } else {
+                navController.navigate(NavigationItem.Profile.route)
+            }
+        } else {
+            navController.navigate("auth") {
+                popUpTo(NavigationItem.Splash.route) { inclusive = true }
+            }
         }
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,10 +93,11 @@ fun SplashScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_logo), // Ensure this is in res/drawable
+            painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = stringResource(id = R.string.intro_image_desc),
             modifier = Modifier.size(200.dp),
             contentScale = ContentScale.Fit
         )
+
     }
 }

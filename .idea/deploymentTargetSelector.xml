@@ -4,16 +4,19 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-21T12:45:14.837552100Z">
+        <DropdownSelection timestamp="2025-06-07T17:16:51.115333200Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=e79d5516" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.29.167:5555;connection=add3de4a" />
             </handle>
           </Target>
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
       <SelectionState runConfigName="ExampleInstrumentedTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="IntroScreenPreview - Small Phone">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

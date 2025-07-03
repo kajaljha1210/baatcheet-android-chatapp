@@ -13,4 +13,10 @@
     <string name="terms_and_conditions">By continuing, you agree to our Terms &amp; Conditions</string>
     <string name="intro_image_desc">\nAppLogo\n</string>
     <string name="login_subheading">Hey there! 👋\nLet’s get you started. Just a phone number away!</string>
+    <string name="profileText">Almost Done!</string>
+    <string name="profile_subtext">Let people know who you are.</string>
+    <string name="finish">Finish Setup</string>
+    <string name="greetingText">Morning! Kajal</string>
+    <string name="msg_text">Enter your message\n</string>
+    <string name="chatText">Kajal</string>
 </resources>

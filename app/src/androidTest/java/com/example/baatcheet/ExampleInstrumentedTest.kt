@@ -1,12 +1,12 @@
 package com.example.baatcheet
 
-import LoginScreen
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.baatcheet.ui.screens.LoginScreen
 
 import org.junit.Test
 import org.junit.runner.RunWith
