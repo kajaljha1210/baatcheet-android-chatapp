@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,7 +33,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewmodel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+
 ) : ViewModel() {
 
     var authState by mutableStateOf(AuthState())
@@ -105,6 +107,8 @@ class AuthViewmodel @Inject constructor(
             onSuccess = {
                 SessionManager.setLogin(context, true, getFullPhoneNumber())
                 Log.d("DEBUG", "✅ SessionManager.setLogin() called")
+
+
                 _eventFlow.emit(UiEvent.NavigateToHome)
             })
     }
@@ -117,9 +121,12 @@ class AuthViewmodel @Inject constructor(
     ) {
         viewModelScope.launch {
             uiState = UiState.Loading
+            val uid = SessionManager.getUid(context).first()
+            val phoneNumber = SessionManager.getPhoneNumber(context).first()
 
-            val uid = SessionManager.getUid(context)
-            val phoneNumber = SessionManager.getPhoneNumber(context)
+
+            Log.d("DEBUG", "UID: $uid, Phone: $phoneNumber") // Add this
+
             if (uid == null) {
                 uiState = UiState.Error("UID not found")
                 onError("Something went wrong. Please login again.")

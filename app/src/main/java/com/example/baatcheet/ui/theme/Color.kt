@@ -2,18 +2,17 @@ package com.example.baatcheet.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Custom App Colors (named properly to avoid magic number warning)
+val DarkNavy = Color(AppColorHex.DARK_NAVY)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// System Colors (named for clarity)
+val AppWhite = Color.White
+val AppBlack = Color.Black
 
-// Define colors based on the description\
-val darkNavy = Color(0xFFF44336)   // Dark navy blue
-val yellow = Color(0xFFFF9800)        // Button color
-val white = Color.White            // Headline and button text
-val lightGray = Color(0xFFCCCCCC)  // Subtext
-val WhatsAppGreen = Color(0xFF00A884)
-val WhatsAppBackground = Color(0xFFECE5DD)
+object AppColorHex {
+    const val DARK_NAVY = 0xFFF44336
+    const val YELLOW = 0xFFFF9800
+    const val LIGHT_GRAY = 0xFFCCCCCC
+    const val WHATSAPP_GREEN = 0xFF00A884
+    const val WHATSAPP_BACKGROUND = 0xFFECE5DD
+}

@@ -78,9 +78,8 @@ fun SplashScreen(navController: NavController) {
                 navController.navigate(NavigationItem.Profile.route)
             }
         } else {
-            navController.navigate("auth") {
-                popUpTo(NavigationItem.Splash.route) { inclusive = true }
-            }
+            navController.navigate(NavigationItem.Intro.route)
+
         }
     }
 

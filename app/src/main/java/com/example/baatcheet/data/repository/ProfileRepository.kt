@@ -33,7 +33,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 "uid" to uid,
                 "name" to name,
                 "phone" to phoneNumber,
-                "imageUrl" to "",
+                "imageUrl" to imageUrl,
                 "isOnline" to false,
                 "lastSeen" to System.currentTimeMillis()
             )
