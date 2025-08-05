@@ -105,42 +105,55 @@ fun CountryCodePicker(
                 .background(MaterialTheme.colorScheme.background, RoundedCornerShape(8.dp))
         ) {
             countryList.forEach { (code, country) ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = code,
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium
-                                ),
-                                modifier = Modifier.width(60.dp)
-                            )
-                            Text(
-                                text = country,
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
-                            )
-                        }
-                    },
+                CountryDropdownItem(
+                    code = code,
+                    country = country,
                     onClick = {
                         onCodeSelected(code)
                         expanded = false
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                    }
                 )
             }
+
         }
     }
+}
+@Composable
+private fun CountryDropdownItem(
+    code: String,
+    country: String,
+    onClick: () -> Unit
+) {
+    DropdownMenuItem(
+        text = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = code,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    modifier = Modifier.width(60.dp)
+                )
+                Text(
+                    text = country,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    )
+                )
+            }
+        },
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    )
 }
 
 @Composable

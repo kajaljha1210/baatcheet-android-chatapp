@@ -1,15 +1,21 @@
 package com.example.baatcheet.ui.utils
 
-object Validator{
+object Validator {
+
+    private const val MAX_PHONE_LENGTH = 10
+    private const val OTP_LENGTH = 6
 
     fun isPhoneNumberValid(phoneNumber: String): Boolean {
-      return phoneNumber.length <= 10 && phoneNumber.isNotEmpty() && phoneNumber.all { it.isDigit() }
+        return phoneNumber.length <= MAX_PHONE_LENGTH &&
+                phoneNumber.isNotEmpty() &&
+                phoneNumber.all { it.isDigit() }
     }
+
     fun isOTPValid(otp: String): Boolean {
-        return otp.length == 6 && otp.all { it.isDigit() }
+        return otp.length == OTP_LENGTH && otp.all { it.isDigit() }
     }
+
     fun isNameValid(name: String): Boolean {
         return name.trim().isNotEmpty()
     }
-
 }

@@ -20,7 +20,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    private val BASE_URL = "https://baatcheet-backend-umxj.onrender.com/"
+    private const val BASE_URL = "https://baatcheet-backend-umxj.onrender.com/"
 
     @Provides
     @Singleton

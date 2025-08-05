@@ -13,9 +13,14 @@ import kotlinx.coroutines.flow.map
 import java.security.SecureRandom
 
 object SessionManager {
+
     private const val TAG = "SessionManager"
 
-    private val Context.dataStore by preferencesDataStore("session_prefs")
+    private const val PREF_NAME = "session_prefs"
+    private const val UID_BYTE_LENGTH = 12
+    private const val UID_TRIM_LENGTH = 16
+
+    private val Context.dataStore by preferencesDataStore(PREF_NAME)
 
     private val KEY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
     private val KEY_PHONE = stringPreferencesKey("phone_number")
@@ -30,19 +35,18 @@ object SessionManager {
             prefs[KEY_IS_LOGGED_IN] = isLoggedIn
             prefs[KEY_PHONE] = phone
             prefs[KEY_UID] = existingUid
-
-            Log.d(TAG, "✅ Data written: UID=$existingUid,isLoggedIn=$isLoggedIn, phone=$phone")
+            Log.d(TAG, "✅ Data written: UID=$existingUid, isLoggedIn=$isLoggedIn, phone=$phone")
         }
-
         Log.d(TAG, "🏁 setLogin() finished")
     }
-    fun generateRandomUid(): String {
-        val randomBytes = ByteArray(12)
-        SecureRandom().nextBytes(randomBytes)
 
+    fun generateRandomUid(): String {
+        val randomBytes = ByteArray(UID_BYTE_LENGTH)
+        SecureRandom().nextBytes(randomBytes)
         return Base64.encodeToString(randomBytes, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
-            .take(16)
+            .take(UID_TRIM_LENGTH)
     }
+
     suspend fun setProfileDone(context: Context, done: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[KEY_PROFILE_DONE] = done
@@ -52,16 +56,14 @@ object SessionManager {
     fun isProfileDone(context: Context): Flow<Boolean> =
         context.dataStore.data.map { it[KEY_PROFILE_DONE] ?: false }
 
-    fun getUid(context: Context): Flow<String?> = context.dataStore.data.map {
-        it[KEY_UID]
-    }
+    fun getUid(context: Context): Flow<String?> =
+        context.dataStore.data.map { it[KEY_UID] }
 
     suspend fun isLoggedIn(context: Context): Boolean {
         val loggedIn = context.dataStore.data.first()[KEY_IS_LOGGED_IN] ?: false
         Log.d(TAG, "🔍 isLoggedIn check: $loggedIn")
         return loggedIn
     }
-
 
     fun getPhoneNumber(context: Context): Flow<String?> =
         context.dataStore.data.map {

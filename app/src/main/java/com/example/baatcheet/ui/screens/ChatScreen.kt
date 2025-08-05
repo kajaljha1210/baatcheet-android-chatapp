@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.baatcheet.ui.components.ChatTopBar
 import com.example.baatcheet.ui.components.Messages
-import com.example.baatcheet.ui.theme.AppWhite
 
 
 @Composable
@@ -91,8 +90,8 @@ fun ChatScreen(navController: NavController? = null) {
                         .height(50.dp),
                     shape = RoundedCornerShape(25.dp),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = AppWhite,
-                        unfocusedContainerColor = AppWhite,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         cursorColor = Color(0xFF075E54)

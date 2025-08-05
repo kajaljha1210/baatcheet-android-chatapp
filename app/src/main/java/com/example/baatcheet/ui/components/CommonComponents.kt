@@ -43,14 +43,17 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.baatcheet.R
+import com.example.baatcheet.ui.theme.DarkNavy
+import com.example.baatcheet.ui.theme.GradientEndColor
+import com.example.baatcheet.ui.theme.GradientMiddleColor
+import com.example.baatcheet.ui.theme.GradientStartColor
 import com.example.baatcheet.ui.theme.Poppins
-import com.example.baatcheet.ui.theme.darkNavy
 
 
 @Composable
 fun HeadingText(text: String, style: TextStyle) {
     val gradientColors = listOf(
-        Color(0xFF0f0c29), Color(0xFF302b63), Color(0xFF24243e)
+        GradientStartColor, GradientMiddleColor, GradientEndColor
     )
 
     Text(
@@ -115,7 +118,7 @@ fun AppButton(
         enabled = enabled,
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(
-            containerColor = darkNavy, // अपनी color value दें
+            containerColor = DarkNavy,
             contentColor = MaterialTheme.colorScheme.surface
         ),
         elevation = ButtonDefaults.elevatedButtonElevation(
@@ -217,7 +220,6 @@ fun AppTextField(
     singleLine: Boolean = true,
     readOnly: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    // अगर आप चाहें तो shape भी fix कर सकते हैं
     shape: Shape = RoundedCornerShape(8.dp)
 ) {
     TextField(
@@ -230,7 +232,7 @@ fun AppTextField(
                 style = TextStyle(
                     color = Color.Gray,
                     fontSize = 16.sp,
-                    fontFamily = Poppins // अपनी पसंद का font, memory[9]
+                    fontFamily = Poppins
                 )
             )
         },
@@ -242,7 +244,7 @@ fun AppTextField(
         textStyle = TextStyle(
             color = Color.Black,
             fontSize = 16.sp,
-            fontFamily = Poppins // अपनी पसंद का font, memory[9]
+            fontFamily = Poppins
         ),
         shape = shape,
         colors = TextFieldDefaults.colors(
@@ -251,7 +253,6 @@ fun AppTextField(
             focusedIndicatorColor = Color.Gray,
             unfocusedIndicatorColor = Color.Gray,
             cursorColor = Color.Gray,
-            // textColor और बाकी colors भी अगर चाहें तो यहाँ fix कर सकते हैं
         )
     )
 }
