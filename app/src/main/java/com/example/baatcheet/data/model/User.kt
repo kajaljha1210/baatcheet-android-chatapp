@@ -1,8 +1,10 @@
 package com.example.baatcheet.data.model
 
-data class User (
-    var id : String,
-    var name : String,
-    var number : String,
-    var imageUrl : String,
+data class User(
+    val uid: String = "",
+    val name: String = "",
+    val phone: String = "",
+    val imageUrl: String? = "",
+    val isOnline: Boolean = false,
+    val createdAt: String? = ""
 )

@@ -1,29 +1,53 @@
 package com.example.baatcheet.ui.theme.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.baatcheet.SplashScreen
 import com.example.baatcheet.ui.screens.ChatListScreen
 import com.example.baatcheet.ui.screens.ChatScreen
 import com.example.baatcheet.ui.screens.LoginScreen
 import com.example.baatcheet.ui.screens.OTPScreen
 import com.example.baatcheet.ui.screens.ProfileScreen
 import com.example.baatcheet.ui.theme.screens.IntroScreen
+import com.example.baatcheet.ui.utils.SessionManager
 import com.example.baatcheet.ui.viewmodel.AuthViewmodel
+import com.example.baatcheet.ui.viewmodel.IntroViewModel
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination: String = NavigationItem.Splash.route,
 ) {
+    val context = LocalContext.current
+    val isLoggedIn = remember { mutableStateOf<Boolean?>(null) }
+    val isProfileDone = remember { mutableStateOf<Boolean?>(null) }
+
+    // Load session state once
+    LaunchedEffect(Unit) {
+        isLoggedIn.value = SessionManager.isLoggedIn(context)
+        isProfileDone.value = SessionManager.isProfileDone(context).first()
+    }
+
+    // Show nothing until session is loaded
+    if (isLoggedIn.value == null || isProfileDone.value == null) return
+
+    // Set dynamic startDestination
+    val startDestination = when {
+        isLoggedIn.value == true && isProfileDone.value == true -> NavigationItem.Home.route
+        isLoggedIn.value == true -> NavigationItem.Profile.route
+        else -> NavigationItem.Intro.route
+    }
+
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -40,13 +64,9 @@ fun AppNavHost(
             }
         }
 
-
-
-        composable(NavigationItem.Splash.route) {
-            SplashScreen(navController)
-        }
         composable(NavigationItem.Intro.route) {
-            IntroScreen(navController)
+            val viewModel: IntroViewModel = hiltViewModel()
+            IntroScreen(navController, viewModel)
         }
 
         composable(NavigationItem.Profile.route) {
@@ -60,6 +80,7 @@ fun AppNavHost(
         }
     }
 }
+
 @Composable
 fun sharedAuthViewModel(
     navController: NavHostController,

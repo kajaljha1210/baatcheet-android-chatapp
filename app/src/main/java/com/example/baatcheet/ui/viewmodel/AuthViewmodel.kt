@@ -8,9 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.airbnb.lottie.LottieComposition
-import com.airbnb.lottie.LottieCompositionFactory
-import com.example.baatcheet.R
+import com.example.baatcheet.data.model.User
 import com.example.baatcheet.data.network.AuthResponse
 import com.example.baatcheet.data.network.Country
 import com.example.baatcheet.data.network.FirebaseResult
@@ -56,16 +54,31 @@ class AuthViewmodel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
-    var introLottieComposition by mutableStateOf<LottieComposition?>(null)
-        private set
-
-    fun preloadIntroAnimation() {
-        // Asynchronously load without await
-        LottieCompositionFactory.fromRawRes(context, R.raw.intro)
-            .addListener { composition ->
-                introLottieComposition = composition
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
+    fun loadUser(uid: String) {
+        viewModelScope.launch {
+            when (val result = profileRepository.getUser(uid)) {
+                is FirebaseResult.Success -> {
+                    _user.value = result.data  // ✅ User type assign ho raha hai
+                }
+                is FirebaseResult.Failure -> {
+                    Log.e("getUser", result.message)
+                }
             }
+        }
     }
+    private val _otherUsers = MutableStateFlow<List<User>>(emptyList())
+    val otherUsers: StateFlow<List<User>> = _otherUsers
+
+    fun loadOtherUsers(currentUid: String) {
+        viewModelScope.launch {
+            when (val result = profileRepository.getAllOtherUsers(currentUid)) {
+                is FirebaseResult.Success -> _otherUsers.value = result.data
+                is FirebaseResult.Failure -> Log.e("getAllOtherUsers", result.message)
+            }
+        }}
+
     fun startTimer() {
         timerJob?.cancel()
         _timer.value = OTP_TIMER_DURATION

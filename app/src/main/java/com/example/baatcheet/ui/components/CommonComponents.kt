@@ -1,13 +1,13 @@
 package com.example.baatcheet.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,12 +37,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.baatcheet.R
 import com.example.baatcheet.ui.theme.DarkNavy
 import com.example.baatcheet.ui.theme.GradientEndColor
 import com.example.baatcheet.ui.theme.GradientMiddleColor
@@ -81,29 +79,22 @@ fun AppText(
     )
 }
 
-
 @Composable
-fun IntroAnim() {
-
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(
-            R.raw.intro
-        )
+fun IntroAnim(composition: LottieComposition) {
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever, // Use 1 if you want it to play only once
+        isPlaying = true
     )
-
-    val preloaderProgress by animateLottieCompositionAsState(
-        composition, iterations = LottieConstants.IterateForever, isPlaying = true
-    )
-
 
     LottieAnimation(
         composition = composition,
-        progress = preloaderProgress,
-        modifier = Modifier.height(400.dp)
+        progress = progress,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(400.dp)
     )
 }
-
-
 @Composable
 fun AppButton(
     text: String,
@@ -116,32 +107,48 @@ fun AppButton(
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(70.dp) // ✅ Safer than fixed height
+            .padding(horizontal = 0.dp, vertical = 0.dp) // no margin here
+            .then(Modifier.padding(bottom = 20.dp)), // ✅ bottom padding separated, not forced
+        shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = DarkNavy,
             contentColor = MaterialTheme.colorScheme.surface
         ),
         elevation = ButtonDefaults.elevatedButtonElevation(
-            defaultElevation = 8.dp, pressedElevation = 12.dp
+            defaultElevation = 8.dp,
+            pressedElevation = 12.dp
         ),
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-        if (icon != null) {
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = icon,
-                contentDescription = iconContentDescription,
-                modifier = Modifier.size(20.dp),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f)
             )
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = iconContentDescription,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .padding(start = 8.dp)
+                )
+            }
         }
     }
 }
+
+
+
 @Composable
 fun NormalTextField(
     value: String,

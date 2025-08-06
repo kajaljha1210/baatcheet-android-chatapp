@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,123 +47,115 @@ import com.example.baatcheet.ui.components.NormalTextField
 import com.example.baatcheet.ui.theme.navigation.NavigationItem
 import com.example.baatcheet.ui.utils.Validator
 import com.example.baatcheet.ui.viewmodel.AuthViewmodel
-
 @Composable
 fun ProfileScreen(
     navController: NavController? = null,
     viewModel: AuthViewmodel = hiltViewModel()
 ) {
     val context = LocalContext.current.applicationContext
-    var name = viewModel.authState.name
+    val name = viewModel.authState.name
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val isNameError = name.isNotEmpty() && !Validator.isNameValid(name)
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedImageUri = uri
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 30.dp)
     ) {
-
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 30.dp)
+                .padding(bottom = 100.dp) // Reserve space for bottom button
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-                    HeadingText(
-                        stringResource(id = R.string.profileText),
-                        MaterialTheme.typography.headlineLarge
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
+            HeadingText(
+                stringResource(id = R.string.profileText),
+                MaterialTheme.typography.headlineLarge
+            )
 
-                    AppText(
-                        stringResource(id = R.string.profile_subtext),
-                        MaterialTheme.typography.bodyLarge,
-                        TextAlign.Start
-                    )
+            Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.height(40.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                launcher.launch("image/*")
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (selectedImageUri != null) {
-                            // User selected image दिखाएं
-                            Image(
-                                painter = rememberAsyncImagePainter(selectedImageUri),
-                                contentDescription = "Profile Image",
-                                modifier = Modifier
-                                    .size(150.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            CircleImage(150.dp, 80.dp)
-                        }
-                    }
+            AppText(
+                stringResource(id = R.string.profile_subtext),
+                MaterialTheme.typography.bodyLarge,
+                TextAlign.Start
+            )
 
-                    Spacer(modifier = Modifier.height(10.dp))
-                    NormalTextField(
-                        value = name,
-                        onChange = { viewModel.onNameChanged(it)  },
-                        hint = "Enter your name",
-                        isError = isNameError,
-                        keyboardType = KeyboardType.Text
-                    )
+            Spacer(modifier = Modifier.height(40.dp))
 
-                    if (isNameError) {
-                        Text(
-                            text = "Name cannot be empty",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                        )
-                    }
-                }
-
-                AppButton(
-                    stringResource(id = R.string.finish),
-                    onClick = {
-                        viewModel.uploadProfile(
-                            context,
-                            imageUri = selectedImageUri,
-                            onSuccess = {
-                                viewModel.completeProfileSetup(context) {
-                                    navController?.navigate(NavigationItem.Home.route)
-                                }
-                            },
-                            onError = { message ->
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                            }
-                        )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        launcher.launch("image/*")
                     },
-                    enabled = name.trim().isNotEmpty() && !isNameError,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
+                contentAlignment = Alignment.Center
+            ) {
+                if (selectedImageUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(selectedImageUri),
+                        contentDescription = "Profile Image",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    CircleImage(150.dp, 80.dp)
+                }
+            }
 
+            Spacer(modifier = Modifier.height(10.dp))
+
+            NormalTextField(
+                value = name,
+                onChange = { viewModel.onNameChanged(it) },
+                hint = "Enter your name",
+                isError = isNameError,
+                keyboardType = KeyboardType.Text
+            )
+
+            if (isNameError) {
+                Text(
+                    text = "Name cannot be empty",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                 )
-                Spacer(modifier = Modifier.height(20.dp)) // Safe spacing from bottom
             }
         }
+
+        // ✅ Bottom fixed button
+        AppButton(
+            text = stringResource(id = R.string.finish),
+            onClick = {
+                viewModel.uploadProfile(
+                    context,
+                    imageUri = selectedImageUri,
+                    onSuccess = {
+                        viewModel.completeProfileSetup(context) {
+                            navController?.navigate(NavigationItem.Home.route) {
+                                popUpTo(NavigationItem.Profile.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
+                    },
+                    onError = { message ->
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                    }
+                )
+            },
+            enabled = name.trim().isNotEmpty() && !isNameError,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 

@@ -1,59 +1,42 @@
 package com.example.baatcheet
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.baatcheet.ui.theme.BaatCheetTheme
 import com.example.baatcheet.ui.theme.navigation.AppNavHost
-import com.example.baatcheet.ui.theme.navigation.NavigationItem
-import com.example.baatcheet.ui.utils.SessionManager
-import com.example.baatcheet.ui.viewmodel.AuthViewmodel
+import com.example.baatcheet.ui.viewmodel.IntroViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-private val viewmodel by viewModels<AuthViewmodel>()
+    private val viewModel: IntroViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-
         super.onCreate(savedInstanceState)
+
+        installSplashScreen().apply {
+            setKeepOnScreenCondition {
+                !viewModel.isLottieReady.value
+            }
+        }
         setContent {
 
             BaatCheetTheme {
-                Surface(modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background) { }
-                AppNavHost(navController = rememberNavController())
-
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavHost(navController = rememberNavController())
+                }
             }
         }
     }
@@ -64,48 +47,6 @@ private val viewmodel by viewModels<AuthViewmodel>()
 fun GreetingPreview() {
     BaatCheetTheme {
         AppNavHost(navController = rememberNavController())
-
-    }
-}
-
-@Composable
-fun SplashScreen(navController: NavController) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.intro))
-    val context = LocalContext.current
-    Log.d("Splash", "Composed!")
-    LaunchedEffect(Unit) {
-        delay(2000)
-
-        val isLoggedIn = SessionManager.isLoggedIn(context)
-        val isProfileDone = SessionManager.isProfileDone(context).first()
-        Log.d("Splash", "🔑 isLoggedIn = $isLoggedIn")
-
-        if (isLoggedIn) {
-            if (isProfileDone) {
-                navController.navigate(NavigationItem.Home.route)
-            } else {
-                navController.navigate(NavigationItem.Profile.route)
-            }
-        } else {
-            navController.navigate(NavigationItem.Intro.route)
-
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(30.dp)
-            .background(color = Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_logo),
-            contentDescription = stringResource(id = R.string.intro_image_desc),
-            modifier = Modifier.size(200.dp),
-            contentScale = ContentScale.Fit
-        )
 
     }
 }

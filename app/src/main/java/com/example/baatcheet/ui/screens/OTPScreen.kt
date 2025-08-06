@@ -5,13 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,7 +44,6 @@ fun OTPScreen(
     navController: NavController? = null,
     viewModel: AuthViewmodel = hiltViewModel()
 ) {
-
     val context = LocalContext.current.applicationContext
     val otp = viewModel.authState.otp
     var error by remember { mutableStateOf(false) }
@@ -58,95 +55,84 @@ fun OTPScreen(
         viewModel.startTimer()
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 30.dp)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 30.dp)
+                .padding(bottom = 100.dp) // Space for fixed button
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
+            Spacer(modifier = Modifier.height(24.dp))
 
-                // Center content vertically using weight
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                ) {
-                    Spacer(modifier = Modifier.height(24.dp))
+            HeadingText(
+                stringResource(id = R.string.otp),
+                MaterialTheme.typography.headlineLarge
+            )
 
-                    HeadingText(
-                        stringResource(id = R.string.otp),
-                        MaterialTheme.typography.headlineLarge
+            Spacer(modifier = Modifier.height(20.dp))
 
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
+            AppText(
+                stringResource(id = R.string.otp_subtext),
+                MaterialTheme.typography.bodyLarge,
+                TextAlign.Start
+            )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                OTPInputRow(
+                    otp = otp,
+                    onOtpChange = { index, value ->
+                        viewModel.onOtpChange(index, value)
+                    },
+                    error = error,
+                    focusRequesters = focusRequesters,
+                    focusManager = focusManager
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (timer > 0) {
                     AppText(
-                        stringResource(id = R.string.otp_subtext),
-                        MaterialTheme.typography.bodyLarge,
-                        TextAlign.Start
+                        text = "Resend OTP in $timer sec",
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        OTPInputRow(
-                            otp = otp,
-                            onOtpChange = { index, value ->
-                              viewModel.onOtpChange(index, value)
-                            },
-                            error = error,
-                            focusRequesters = focusRequesters,
-                            focusManager = focusManager
-                        )
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        if (timer > 0) {
-                            AppText(
-                                text = "Resend OTP in $timer sec",
-                                style = MaterialTheme.typography.bodySmall,
-                                textAlign = TextAlign.Center
-                            )
-                        } else {
-                            TextButton(onClick = {
-                                viewModel.resetOtpAndTimer()
-                                focusRequesters[0].requestFocus()
-                                error = false
-                            }) {
-                                Text("Resend OTP")
-                            }
-                        }
+                } else {
+                    TextButton(onClick = {
+                        viewModel.resetOtpAndTimer()
+                        focusRequesters[0].requestFocus()
+                        error = false
+                    }) {
+                        Text("Resend OTP")
                     }
                 }
-                AppButton(
-                    stringResource(id = R.string.otp),
-                    onClick = {
-                        val enteredOtp = otp.joinToString("")
-                        if (Validator.isOTPValid(enteredOtp)) {
-                            viewModel.verifyOtp(context)
-                            error = false
-                            navController?.navigate(NavigationItem.Profile.route){
-                                popUpTo(NavigationItem.Intro.route) { inclusive = true }
-                                launchSingleTop = true
-
-                            }
-                        } else {
-                            error = true
-                        }
-                    },
-                    enabled = otp.joinToString("").length == 6 && otp.all { it.length == 1 } && !error,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                )
-                Spacer(modifier = Modifier.height(20.dp))
             }
         }
+
+        // ✅ Fixed Bottom Button
+        AppButton(
+            text = stringResource(id = R.string.otp),
+            onClick = {
+                val enteredOtp = otp.joinToString("")
+                if (Validator.isOTPValid(enteredOtp)) {
+                    viewModel.verifyOtp(context)
+                    error = false
+                    navController?.navigate(NavigationItem.Profile.route) {
+                        popUpTo(NavigationItem.Intro.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                } else {
+                    error = true
+                }
+            },
+            enabled = otp.joinToString("").length == 6 && otp.all { it.length == 1 } && !error,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 

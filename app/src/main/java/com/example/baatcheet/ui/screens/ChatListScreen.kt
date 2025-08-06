@@ -1,5 +1,8 @@
 package com.example.baatcheet.ui.screens
 
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,27 +22,68 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.baatcheet.R
 import com.example.baatcheet.ui.components.AppText
 import com.example.baatcheet.ui.components.ChatListItem
 import com.example.baatcheet.ui.components.ChatSearchBar
+import com.example.baatcheet.ui.utils.SessionManager
+import com.example.baatcheet.ui.viewmodel.AuthViewmodel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatListScreen(navController: NavController? = null) {
+fun ChatListScreen(
+    navController: NavController? = null,
+    viewModel: AuthViewmodel = hiltViewModel()
+) {
     var searchQuery by remember { mutableStateOf("") }
     val filterOptions = listOf("All", "Unread", "Groups", "Favourites")
     var selectedFilter by remember { mutableStateOf("All") }
+
+    var backPressedOnce by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var uid by remember { mutableStateOf<String?>(null) }
+//    val user by viewModel.user.collectAsState()
+    val users by viewModel.otherUsers.collectAsState()
+
+    LaunchedEffect(Unit) {
+        uid = SessionManager.getUid(context).first()
+        uid?.let {
+            viewModel.loadOtherUsers(it)
+        }
+    }    // BackHandler runs immediately on back press
+    BackHandler {
+        if (backPressedOnce) {
+            (context as? Activity)?.finish()
+        } else {
+            backPressedOnce = true
+        }
+    }
+
+    // Toast runs only when backPressedOnce becomes true
+    LaunchedEffect(backPressedOnce) {
+        if (backPressedOnce) {
+            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            delay(2000)
+            backPressedOnce = false
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -102,24 +146,26 @@ fun ChatListScreen(navController: NavController? = null) {
                 contentPadding = PaddingValues(bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
-                items(20) { index ->
-                    ChatListItem(
-                        userName = "User $index",
-                        message = "Last message from User $index...",
-                        time = "12:${index}0 PM",
-                        unreadCount = if (index % 3 == 0) (index + 1) else 0,
-                        onClick = {
-                            navController?.navigate("chat")
+
+                items(users) { users ->
+
+                ChatListItem(
+                            userName = "${users.name}",
+                            message = "How are You?",
+                            time = "12:${users.createdAt}",
+                            unreadCount = if (20 % 3 == 0) (20 + 1) else 0,
+                            onClick = {
+                                navController?.navigate("chat")
+                            }
+                        )
+                        if (20 < 19) {
+                            Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)
                         }
-                    )
-                    if (index < 19) {
-                        Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)
                     }
                 }
             }
         }
     }
-}
 
 
 
