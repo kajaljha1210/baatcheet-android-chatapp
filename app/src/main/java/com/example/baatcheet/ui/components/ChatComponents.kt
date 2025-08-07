@@ -33,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +40,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.baatcheet.ui.theme.Poppins
 
 
 @Composable
@@ -146,21 +144,7 @@ fun ChatListItem(
 
 }
 
-@Composable
-fun UnreadCounts() {
-    Text(
-        modifier = Modifier
-            .drawBehind {
-                drawCircle(
-                    color = Color.Blue,
-                    radius = 2F
-                )
-            },
-        text = "1",
-        fontFamily = Poppins,
-        fontSize = 12.sp
-    )
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

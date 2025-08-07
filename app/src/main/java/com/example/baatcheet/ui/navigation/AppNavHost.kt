@@ -79,11 +79,11 @@ fun AppNavHost(
             ChatListScreen(navController)
         }
         composable(
-            route = "chat/{receiverId}",
-            arguments = listOf(navArgument("receiverId") { type = NavType.StringType })
+            route = NavigationItem.Chat.routeWithArgument,
+            arguments = listOf(navArgument(NavigationItem.Chat.argument) { type = NavType.StringType })
         ) { backStackEntry ->
             val viewModel: ChatViewModel = hiltViewModel()
-            val receiverId = backStackEntry.arguments?.getString("receiverId") ?: ""
+            val receiverId = backStackEntry.arguments?.getString(NavigationItem.Chat.argument) ?: ""
             ChatScreen(viewModel = viewModel, receiverId = receiverId, navController = navController)
         }
 

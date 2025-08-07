@@ -95,6 +95,7 @@ fun IntroAnim(composition: LottieComposition) {
             .height(400.dp)
     )
 }
+
 @Composable
 fun AppButton(
     text: String,

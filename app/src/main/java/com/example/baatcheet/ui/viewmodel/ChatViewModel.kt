@@ -2,7 +2,7 @@ package com.example.baatcheet.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.baatcheet.data.model.ChatListItemData
+import com.example.baatcheet.data.model.ChatList
 import com.example.baatcheet.data.model.Message
 import com.example.baatcheet.data.repository.ChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,8 +25,8 @@ class ChatViewModel @Inject constructor(
     private val _messageText = MutableStateFlow("")
     val messageText: StateFlow<String> = _messageText
 
-    private val _chatList = MutableStateFlow<List<ChatListItemData>>(emptyList())
-    val chatList: StateFlow<List<ChatListItemData>> = _chatList
+    private val _chatList = MutableStateFlow<List<ChatList>>(emptyList())
+    val chatList: StateFlow<List<ChatList>> = _chatList
 
     fun loadChatList(currentUserId: String) {
         viewModelScope.launch {
@@ -40,7 +40,7 @@ class ChatViewModel @Inject constructor(
 
     fun initializeChat(senderId: String, receiverId: String) {
         viewModelScope.launch {
-            val id = chatRepository.getOrCreateChatId(senderId, receiverId)
+            val id = chatRepository.createChatId(senderId, receiverId)
             _chatId.value = id
             observeMessages(id)
             markSeen(id, senderId)
@@ -54,13 +54,6 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-
-    private fun markSeen(chatId: String, userId: String) {
-        viewModelScope.launch {
-            chatRepository.markMessagesAsSeen(chatId, userId)
-        }
-    }
-
     fun sendMessage(senderId: String, receiverId: String) {
         val msg = messageText.value.trim()
         if (msg.isEmpty() || chatId.value == null) return
@@ -70,4 +63,11 @@ class ChatViewModel @Inject constructor(
             _messageText.value = ""
         }
     }
+    private fun markSeen(chatId: String, userId: String) {
+        viewModelScope.launch {
+            chatRepository.markMessagesAsSeen(chatId, userId)
+        }
+    }
+
+
 }
