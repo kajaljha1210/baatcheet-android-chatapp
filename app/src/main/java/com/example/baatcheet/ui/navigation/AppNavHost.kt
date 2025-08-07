@@ -9,8 +9,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.baatcheet.ui.screens.ChatListScreen
 import com.example.baatcheet.ui.screens.ChatScreen
@@ -20,6 +22,7 @@ import com.example.baatcheet.ui.screens.ProfileScreen
 import com.example.baatcheet.ui.theme.screens.IntroScreen
 import com.example.baatcheet.ui.utils.SessionManager
 import com.example.baatcheet.ui.viewmodel.AuthViewmodel
+import com.example.baatcheet.ui.viewmodel.ChatViewModel
 import com.example.baatcheet.ui.viewmodel.IntroViewModel
 import kotlinx.coroutines.flow.first
 
@@ -75,9 +78,15 @@ fun AppNavHost(
         composable(NavigationItem.Home.route) {
             ChatListScreen(navController)
         }
-        composable(NavigationItem.Chat.route) {
-            ChatScreen(navController)
+        composable(
+            route = "chat/{receiverId}",
+            arguments = listOf(navArgument("receiverId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val viewModel: ChatViewModel = hiltViewModel()
+            val receiverId = backStackEntry.arguments?.getString("receiverId") ?: ""
+            ChatScreen(viewModel = viewModel, receiverId = receiverId, navController = navController)
         }
+
     }
 }
 

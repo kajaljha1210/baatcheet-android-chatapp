@@ -41,7 +41,7 @@ import com.example.baatcheet.ui.components.AppText
 import com.example.baatcheet.ui.components.ChatListItem
 import com.example.baatcheet.ui.components.ChatSearchBar
 import com.example.baatcheet.ui.utils.SessionManager
-import com.example.baatcheet.ui.viewmodel.AuthViewmodel
+import com.example.baatcheet.ui.viewmodel.ChatViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 
@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.first
 @Composable
 fun ChatListScreen(
     navController: NavController? = null,
-    viewModel: AuthViewmodel = hiltViewModel()
+    viewModel: ChatViewModel = hiltViewModel()
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val filterOptions = listOf("All", "Unread", "Groups", "Favourites")
@@ -58,15 +58,19 @@ fun ChatListScreen(
     var backPressedOnce by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var uid by remember { mutableStateOf<String?>(null) }
-//    val user by viewModel.user.collectAsState()
-    val users by viewModel.otherUsers.collectAsState()
+
+
+    val chatList by viewModel.chatList.collectAsState()
 
     LaunchedEffect(Unit) {
         uid = SessionManager.getUid(context).first()
         uid?.let {
-            viewModel.loadOtherUsers(it)
+            viewModel.loadChatList(it)
         }
-    }    // BackHandler runs immediately on back press
+    }
+
+
+    // BackHandler runs immediately on back press
     BackHandler {
         if (backPressedOnce) {
             (context as? Activity)?.finish()
@@ -147,22 +151,20 @@ fun ChatListScreen(
                 verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
 
-                items(users) { users ->
-
-                ChatListItem(
-                            userName = "${users.name}",
-                            message = "How are You?",
-                            time = "12:${users.createdAt}",
-                            unreadCount = if (20 % 3 == 0) (20 + 1) else 0,
-                            onClick = {
-                                navController?.navigate("chat")
-                            }
-                        )
-                        if (20 < 19) {
-                            Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)
+                items(chatList) { chat ->
+                    ChatListItem(
+                        userName = chat.partnerName, // Replace with fetched name below
+                        message = chat.lastMessage,
+                        time = chat.lastMessageTimestamp, // create formatTime()
+                        unreadCount = chat.unreadCount,
+                        onClick = {
+                            navController?.navigate("chat/${chat.partnerId}")
                         }
-                    }
+                    )
+                    Divider(color = Color(0xFFE0E0E0), thickness = 0.5.dp)
                 }
+
+            }
             }
         }
     }

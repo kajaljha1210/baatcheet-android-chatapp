@@ -1,7 +1,6 @@
 package com.example.baatcheet.data.repository
 
 import android.net.Uri
-import com.example.baatcheet.data.model.User
 import com.example.baatcheet.data.network.FirebaseResult
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -13,9 +12,6 @@ import javax.inject.Inject
 
 interface ProfileRepository {
     suspend fun uploadProfile(uid: String, name: String, phoneNumber: String, imageUri: Uri?): FirebaseResult<Unit>
-    suspend fun getUser(uid: String): FirebaseResult<User>
-    suspend fun getAllOtherUsers(currentUid: String): FirebaseResult<List<User>>
-
 }
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -55,34 +51,4 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUser(uid: String): FirebaseResult<User> {
-        return try {
-            val snapshot = firestore.collection("users").document(uid).get().await()
-            if (snapshot.exists()) {
-                val user = snapshot.toObject(User::class.java)
-                if (user != null) {
-                    FirebaseResult.Success(user)
-                } else {
-                    FirebaseResult.Failure("User data is null")
-                }
-            } else {
-                FirebaseResult.Failure("User not found")
-            }
-        } catch (e: Exception) {
-            FirebaseResult.Failure(e.message ?: "Something went wrong")
-        }
-    }
-
-    override suspend fun getAllOtherUsers(currentUid: String): FirebaseResult<List<User>> {
-        return try {
-            val snapshot = firestore.collection("users").get().await()
-            val userList = snapshot.documents.mapNotNull { doc ->
-                val user = doc.toObject(User::class.java)
-                if (user?.uid != currentUid) user else null
-            }
-            FirebaseResult.Success(userList)
-        } catch (e: Exception) {
-            FirebaseResult.Failure(e.message ?: "Something went wrong")
-        }
-    }
 }

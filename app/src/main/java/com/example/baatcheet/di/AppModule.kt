@@ -3,6 +3,8 @@ package com.example.baatcheet.di
 import com.example.baatcheet.data.network.ApiServices
 import com.example.baatcheet.data.repository.AuthRepository
 import com.example.baatcheet.data.repository.AuthRepositoryImpl
+import com.example.baatcheet.data.repository.ChatRepository
+import com.example.baatcheet.data.repository.ChatRepositoryImpl
 import com.example.baatcheet.data.repository.ProfileRepository
 import com.example.baatcheet.data.repository.ProfileRepositoryImpl
 import com.google.firebase.firestore.FirebaseFirestore
@@ -30,8 +32,8 @@ object AppModule {
             level = HttpLoggingInterceptor.Level.BODY
         }
         return OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS) // server connect hone ka wait
-            .readTimeout(30, TimeUnit.SECONDS)    // server se data read hone ka wait
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(logging)
             .build()
@@ -74,5 +76,13 @@ object AppModule {
         fireStore: FirebaseFirestore
     ): ProfileRepository {
         return ProfileRepositoryImpl(storage, fireStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatRepository(
+        fireStore: FirebaseFirestore
+    ): ChatRepository {
+        return ChatRepositoryImpl(fireStore)
     }
 }

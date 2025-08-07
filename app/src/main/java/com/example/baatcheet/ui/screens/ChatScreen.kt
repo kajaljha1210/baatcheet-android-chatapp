@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
@@ -22,18 +23,50 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.baatcheet.ui.components.ChatTopBar
 import com.example.baatcheet.ui.components.Messages
-
+import com.example.baatcheet.ui.utils.SessionManager
+import com.example.baatcheet.ui.viewmodel.ChatViewModel
+import kotlinx.coroutines.flow.firstOrNull
 
 @Composable
-fun ChatScreen(navController: NavController? = null) {
+fun ChatScreen(
+    viewModel: ChatViewModel? = null,
+    receiverId: String? = "",
+    navController: NavController? = null
+) {
+    if (viewModel == null || receiverId.isNullOrEmpty()) return
+
+    val context = LocalContext.current
+    var senderId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        senderId = SessionManager.getUid(context).firstOrNull()
+    }
+
+    val messages by viewModel.messages.collectAsState()
+    val messageText by viewModel.messageText.collectAsState()
+
+    // Initialize chat when senderId and receiverId are available
+    LaunchedEffect(senderId, receiverId) {
+        if (!senderId.isNullOrEmpty()) {
+            viewModel.initializeChat(senderId!!, receiverId)
+        }
+    }
+
     Scaffold(
         topBar = {
             ChatTopBar(navController = navController)
@@ -45,7 +78,7 @@ fun ChatScreen(navController: NavController? = null) {
                 .padding(padding)
                 .imePadding()
         ) {
-//            // Chat Messages Area
+            // Message Area
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -53,24 +86,27 @@ fun ChatScreen(navController: NavController? = null) {
                     .padding(horizontal = 12.dp)
             ) {
                 LazyColumn(
-                    reverseLayout = true // latest message at bottom
+                    reverseLayout = true
                 ) {
-                    items(20) {
-                        Messages("Hi, How are you?", "22:30 pm", it % 2 == 0)
+                    items(messages.reversed()) { msg ->
+                        Messages(
+                            message = msg.text,
+                            time = msg.timestamp,
+                            isSentByMe = msg.senderId == senderId
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
 
-            // Bottom Input Bar (WhatsApp-style)
+            // Bottom Input Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Emoji icon
-                IconButton(onClick = { /* Emoji */ }) {
+                IconButton(onClick = { /* Emoji action */ }) {
                     Icon(
                         imageVector = Icons.Default.Face,
                         contentDescription = "Emoji",
@@ -78,13 +114,10 @@ fun ChatScreen(navController: NavController? = null) {
                     )
                 }
 
-                // Input Field
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { /* your msg update */ },
-                    placeholder = {
-                        Text("Message", color = Color.Gray)
-                    },
+                    value = messageText,
+                    onValueChange = viewModel::onMessageTextChange, // ✅ fix name
+                    placeholder = { Text("Message", color = Color.Gray) },
                     modifier = Modifier
                         .weight(1f)
                         .height(50.dp),
@@ -101,8 +134,11 @@ fun ChatScreen(navController: NavController? = null) {
 
                 Spacer(modifier = Modifier.width(4.dp))
 
-                // Send button
-                IconButton(onClick = { /* Send */ }) {
+                IconButton(onClick = {
+                    if (!senderId.isNullOrEmpty()) {
+                        viewModel.sendMessage(senderId!!, receiverId)
+                    }
+                }) {
                     Icon(
                         imageVector = Icons.Default.Send,
                         contentDescription = "Send",

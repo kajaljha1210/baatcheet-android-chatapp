@@ -191,14 +191,14 @@ fun ChatTopBar(
                         userName,
                         MaterialTheme.typography.bodyLarge,
                         TextAlign.Start,
-                        Color.White
+                        Color.Black
                     )
 
 
                     Text(
                         text = lastSeen,
                         fontSize = 12.sp,
-                        color = Color.LightGray
+                        color = Color.DarkGray
                     )
                 }
             }
@@ -208,13 +208,13 @@ fun ChatTopBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White
+                    tint = Color.Black
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF075E54), // WhatsApp green
-            titleContentColor = Color.White
+            containerColor = Color.White, // WhatsApp green
+            titleContentColor = Color.Black
         )
     )
 }
