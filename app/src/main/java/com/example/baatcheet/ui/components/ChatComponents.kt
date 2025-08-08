@@ -150,8 +150,9 @@ fun ChatListItem(
 @Composable
 fun ChatTopBar(
     navController: NavController? = null,
-    userName: String = "Kajal",
-    lastSeen: String = "last seen today at 10:45 PM"
+    userName: String?= "",
+    isOnline: Boolean = false,
+    lastSeen: String? = ""
 ) {
     TopAppBar(
         title = {
@@ -172,7 +173,7 @@ fun ChatTopBar(
                 // Name & last seen
                 Column {
                     AppText(
-                        userName,
+                        userName.toString(),
                         MaterialTheme.typography.bodyLarge,
                         TextAlign.Start,
                         Color.Black
@@ -180,7 +181,7 @@ fun ChatTopBar(
 
 
                     Text(
-                        text = lastSeen,
+                        text = if (isOnline) "Online" else "Last seen: $lastSeen",
                         fontSize = 12.sp,
                         color = Color.DarkGray
                     )

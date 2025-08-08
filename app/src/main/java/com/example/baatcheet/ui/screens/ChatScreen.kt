@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.baatcheet.data.model.UserPresence
 import com.example.baatcheet.ui.components.ChatTopBar
 import com.example.baatcheet.ui.components.Messages
 import com.example.baatcheet.ui.utils.SessionManager
@@ -59,6 +60,16 @@ fun ChatScreen(
 
     val messages by viewModel.messages.collectAsState()
     val messageText by viewModel.messageText.collectAsState()
+    val presence by viewModel.getPresence(receiverId.toString())
+        .collectAsState(initial = UserPresence())
+    var receiverName by remember { mutableStateOf("Loading...") }
+
+    LaunchedEffect(receiverId) {
+        receiverId.let {
+            val user = viewModel.getUserById(it)
+            receiverName = user?.name ?: "Unknown"
+        }
+    }
 
     // Initialize chat when senderId and receiverId are available
     LaunchedEffect(senderId, receiverId) {
@@ -69,7 +80,12 @@ fun ChatScreen(
 
     Scaffold(
         topBar = {
-            ChatTopBar(navController = navController)
+            ChatTopBar(
+                navController = navController,
+                userName = receiverName,
+                isOnline = presence.isOnline,
+                lastSeen = presence.lastSeen
+            )
         }
     ) { padding ->
         Column(
@@ -127,7 +143,7 @@ fun ChatScreen(
                         unfocusedContainerColor = Color.White,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = Color(0xFF075E54)
+                        cursorColor = Color(color = 0xFF075E54)
                     ),
                     singleLine = true
                 )
@@ -142,7 +158,7 @@ fun ChatScreen(
                     Icon(
                         imageVector = Icons.Default.Send,
                         contentDescription = "Send",
-                        tint = Color(0xFF075E54)
+                        tint = Color(color = 0xFF075E54)
                     )
                 }
             }

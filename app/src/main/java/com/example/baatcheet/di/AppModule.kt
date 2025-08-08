@@ -7,6 +7,7 @@ import com.example.baatcheet.data.repository.ChatRepository
 import com.example.baatcheet.data.repository.ChatRepositoryImpl
 import com.example.baatcheet.data.repository.ProfileRepository
 import com.example.baatcheet.data.repository.ProfileRepositoryImpl
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
@@ -71,11 +72,17 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFirebaseDatabase(): FirebaseDatabase = FirebaseDatabase.getInstance()
+
+
+    @Provides
+    @Singleton
     fun provideProfileRepository(
         storage: FirebaseStorage,
-        fireStore: FirebaseFirestore
+        fireStore: FirebaseFirestore,
+        realtimeDb: FirebaseDatabase,
     ): ProfileRepository {
-        return ProfileRepositoryImpl(storage, fireStore)
+        return ProfileRepositoryImpl(storage, fireStore,realtimeDb)
     }
 
     @Provides

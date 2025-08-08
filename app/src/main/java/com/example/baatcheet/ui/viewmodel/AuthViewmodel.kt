@@ -13,10 +13,10 @@ import com.example.baatcheet.data.network.Country
 import com.example.baatcheet.data.network.FirebaseResult
 import com.example.baatcheet.data.repository.AuthRepository
 import com.example.baatcheet.data.repository.ProfileRepository
+import com.example.baatcheet.ui.navigation.NavigationItem
 import com.example.baatcheet.ui.state.AuthState
 import com.example.baatcheet.ui.state.UiEvent
 import com.example.baatcheet.ui.state.UiState
-import com.example.baatcheet.ui.theme.navigation.NavigationItem
 import com.example.baatcheet.ui.utils.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -180,6 +180,12 @@ class AuthViewmodel @Inject constructor(
                 uiState = UiState.Error(response.message)
                 _eventFlow.emit(UiEvent.ShowToast(response.message))
             }
+        }
+    }
+    fun skipLoginForNow(context: Context) {
+        viewModelScope.launch {
+            SessionManager.setLogin(context, true, "+919839298551") // use a fixed phone
+            _eventFlow.emit(UiEvent.Navigate(NavigationItem.Profile.route))
         }
     }
 

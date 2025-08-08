@@ -111,7 +111,7 @@ fun LoginScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .weight(0.3f)
+                        .weight(weight = 0.3f)
                         .defaultMinSize(minWidth = 80.dp)
                 ) {
                     CountryCodePicker(
@@ -126,7 +126,7 @@ fun LoginScreen(
                 }
 
                 Box(
-                    modifier = Modifier.weight(0.7f)
+                    modifier = Modifier.weight(weight = 0.7f)
                 ) {
                     NormalTextField(
                         value = phoneNumber,
@@ -153,7 +153,8 @@ fun LoginScreen(
         AppButton(
             text = stringResource(id = R.string.login),
             onClick = {
-                viewModel.sendOtp()
+//                viewModel.sendOtp()
+                viewModel.skipLoginForNow(context)
             },
             enabled = isButtonEnabled,
             modifier = Modifier.align(Alignment.BottomCenter)

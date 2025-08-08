@@ -35,7 +35,7 @@ import com.example.baatcheet.ui.components.AppButton
 import com.example.baatcheet.ui.components.AppText
 import com.example.baatcheet.ui.components.HeadingText
 import com.example.baatcheet.ui.components.OTPInputRow
-import com.example.baatcheet.ui.theme.navigation.NavigationItem
+import com.example.baatcheet.ui.navigation.NavigationItem
 import com.example.baatcheet.ui.utils.Validator
 import com.example.baatcheet.ui.viewmodel.AuthViewmodel
 

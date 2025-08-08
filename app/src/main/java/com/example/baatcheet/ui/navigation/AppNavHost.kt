@@ -1,4 +1,4 @@
-package com.example.baatcheet.ui.theme.navigation
+package com.example.baatcheet.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,10 +16,10 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.baatcheet.ui.screens.ChatListScreen
 import com.example.baatcheet.ui.screens.ChatScreen
+import com.example.baatcheet.ui.screens.IntroScreen
 import com.example.baatcheet.ui.screens.LoginScreen
 import com.example.baatcheet.ui.screens.OTPScreen
 import com.example.baatcheet.ui.screens.ProfileScreen
-import com.example.baatcheet.ui.theme.screens.IntroScreen
 import com.example.baatcheet.ui.utils.SessionManager
 import com.example.baatcheet.ui.viewmodel.AuthViewmodel
 import com.example.baatcheet.ui.viewmodel.ChatViewModel

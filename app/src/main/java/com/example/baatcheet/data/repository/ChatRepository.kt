@@ -6,6 +6,7 @@ import com.example.baatcheet.data.model.User
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.awaitClose
@@ -19,7 +20,7 @@ import java.util.UUID
 
 interface ChatRepository {
     suspend fun createChatId(senderId: String, receiverId: String): String
-    suspend fun getChatList(currentUserId: String): List<ChatList>
+    suspend fun getChatList(currentUserId: String): Flow<List<ChatList>>
     suspend fun sendMessage(senderId: String, receiverId: String, message: String)
     suspend fun getMessages(chatId: String): Flow<List<Message>>
     suspend fun markMessagesAsSeen(chatId: String, userId: String)
@@ -53,45 +54,63 @@ class ChatRepositoryImpl @Inject constructor(
         firestore.collection("chats").document(newChatId).set(chatData).await()
         return newChatId
     }
-
-    override suspend fun getChatList(currentUserId: String): List<ChatList> {
-        val usersSnapshot = firestore.collection("users").get().await()
-        val allUsers = usersSnapshot.documents.mapNotNull { it.toObject(User::class.java) }
-            .filter { it.uid != currentUserId }
-
-        val chatsSnapshot = firestore.collection("chats")
+    override suspend fun getChatList(currentUserId: String): Flow<List<ChatList>> = callbackFlow {
+        val usersRef = firestore.collection("users")
+        val chatsRef = firestore.collection("chats")
             .whereArrayContains("participants", currentUserId)
-            .get().await()
 
-        val chatMap = chatsSnapshot.documents.associateBy { doc ->
-            val participants = doc.get("participants") as? List<*>
-            participants?.firstOrNull { it != currentUserId } as? String ?: ""
+        var latestUsers: List<User> = emptyList()
+        var latestChatsSnapshot: QuerySnapshot? = null
+
+        fun emitCombinedData() {
+            if (latestChatsSnapshot == null || latestUsers.isEmpty()) return
+
+            val chatList = latestUsers.map { user ->
+                val chatDoc = latestChatsSnapshot!!.documents.find { doc ->
+                    val participants = doc.get("participants") as? List<*>
+                    participants?.contains(user.uid) == true
+                }
+
+                val data = chatDoc?.data
+                ChatList(
+                    chatId = chatDoc?.id ?: "",
+                    partnerId = user.uid,
+                    partnerName = user.name,
+                    partnerImage = user.imageUrl,
+                    lastMessage = data?.get("lastMessage") as? String ?: "",
+                    lastMessageTimestamp = data?.get("lastMessageTimestamp") as? String ?: "",
+                    unreadCount = ((data?.get("unreadCount") as? Map<*, *>)?.get(currentUserId) as? Number)?.toInt() ?: 0,
+                    seen = ((data?.get("seenStatus") as? Map<*, *>)?.get(currentUserId) as? Boolean) ?: false
+                )
+            }
+
+            trySend(chatList).isSuccess
         }
 
-        return allUsers.map { user ->
-            val chatDoc = chatMap[user.uid]
-            val data = chatDoc?.data
+        // 👤 Listen to users
+        val usersListener = usersRef.addSnapshotListener { userSnap, userError ->
+            if (userError != null || userSnap == null) return@addSnapshotListener
 
-            val lastMessage = data?.get("lastMessage") as? String ?: ""
-            val lastMessageTimestamp = data?.get("lastMessageTimestamp") as? String ?: ""
-            val unreadCount =
-                ((data?.get("unreadCount") as? Map<*, *>)?.get(currentUserId) as? Number)?.toInt()
-                    ?: 0
-            val seen =
-                ((data?.get("seenStatus") as? Map<*, *>)?.get(currentUserId) as? Boolean) ?: false
+            latestUsers = userSnap.documents.mapNotNull { it.toObject(User::class.java) }
+                .filter { it.uid != currentUserId }
 
-            ChatList(
-                chatId = chatDoc?.id ?: "",
-                partnerId = user.uid,
-                partnerName = user.name,
-                partnerImage = user.imageUrl,
-                lastMessage = lastMessage,
-                lastMessageTimestamp = lastMessageTimestamp,
-                unreadCount = unreadCount,
-                seen = seen
-            )
+            emitCombinedData()
+        }
+
+        // 💬 Listen to chats
+        val chatsListener = chatsRef.addSnapshotListener { chatSnap, chatError ->
+            if (chatError != null || chatSnap == null) return@addSnapshotListener
+
+            latestChatsSnapshot = chatSnap
+            emitCombinedData()
+        }
+
+        awaitClose {
+            usersListener.remove()
+            chatsListener.remove()
         }
     }
+
     override suspend fun sendMessage(senderId: String, receiverId: String, message: String) {
         val chatId = createChatId(senderId, receiverId)
         val chatRef = firestore.collection("chats").document(chatId)

@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
+import com.example.baatcheet.ui.navigation.AppNavHost
 import com.example.baatcheet.ui.theme.BaatCheetTheme
-import com.example.baatcheet.ui.theme.navigation.AppNavHost
 import com.example.baatcheet.ui.viewmodel.IntroViewModel
 import dagger.hilt.android.AndroidEntryPoint
 

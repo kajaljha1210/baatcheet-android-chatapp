@@ -1,4 +1,4 @@
-package com.example.baatcheet.ui.theme.navigation
+package com.example.baatcheet.ui.navigation
 
 
 enum class Screen {

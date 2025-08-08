@@ -1,4 +1,4 @@
-package com.example.baatcheet.ui.theme.screens
+package com.example.baatcheet.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import com.example.baatcheet.ui.components.AppButton
 import com.example.baatcheet.ui.components.AppText
 import com.example.baatcheet.ui.components.HeadingText
 import com.example.baatcheet.ui.components.IntroAnim
-import com.example.baatcheet.ui.theme.navigation.NavigationItem
+import com.example.baatcheet.ui.navigation.NavigationItem
 import com.example.baatcheet.ui.viewmodel.IntroViewModel
 
 @Composable

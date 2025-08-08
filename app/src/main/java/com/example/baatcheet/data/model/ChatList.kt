@@ -5,8 +5,11 @@ data class User(
     val name: String = "",
     val phone: String = "",
     val imageUrl: String? = "",
-    val isOnline: Boolean = false,
     val createdAt: String = ""
+)
+data class UserPresence(
+    val isOnline: Boolean = false,
+    val lastSeen: String = ""
 )
 
 data class Message(

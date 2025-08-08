@@ -49,6 +49,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx" }
+firebase-database = { module = "com.google.firebase:firebase-database-ktx", version = "20.3.1" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }

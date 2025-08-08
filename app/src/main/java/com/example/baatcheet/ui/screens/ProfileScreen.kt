@@ -44,7 +44,7 @@ import com.example.baatcheet.ui.components.AppText
 import com.example.baatcheet.ui.components.CircleImage
 import com.example.baatcheet.ui.components.HeadingText
 import com.example.baatcheet.ui.components.NormalTextField
-import com.example.baatcheet.ui.theme.navigation.NavigationItem
+import com.example.baatcheet.ui.navigation.NavigationItem
 import com.example.baatcheet.ui.utils.Validator
 import com.example.baatcheet.ui.viewmodel.AuthViewmodel
 @Composable

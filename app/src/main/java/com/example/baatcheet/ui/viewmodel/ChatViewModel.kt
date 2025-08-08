@@ -4,16 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.baatcheet.data.model.ChatList
 import com.example.baatcheet.data.model.Message
+import com.example.baatcheet.data.model.User
+import com.example.baatcheet.data.model.UserPresence
 import com.example.baatcheet.data.repository.ChatRepository
+import com.example.baatcheet.data.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     private val _chatId = MutableStateFlow<String?>(null)
@@ -28,12 +33,34 @@ class ChatViewModel @Inject constructor(
     private val _chatList = MutableStateFlow<List<ChatList>>(emptyList())
     val chatList: StateFlow<List<ChatList>> = _chatList
 
-    fun loadChatList(currentUserId: String) {
+    suspend fun getUserById(userId: String): User? {
+        return profileRepository.getUserById(userId)
+    }
+
+    fun goOnline(userId: String) {
         viewModelScope.launch {
-            val result = chatRepository.getChatList(currentUserId)
-            _chatList.value = result
+            profileRepository.setUserOnline(userId)
         }
     }
+
+    fun goOffline(userId: String) {
+        viewModelScope.launch {
+            profileRepository.setUserOffline(userId)
+        }
+    }
+
+     fun getPresence(userId: String): Flow<UserPresence> {
+        return profileRepository.observePresence(userId)
+    }
+    fun loadChatList(currentUserId: String) {
+        viewModelScope.launch {
+            chatRepository.getChatList(currentUserId)
+                .collect { chatList ->
+                    _chatList.value = chatList
+                }
+        }
+    }
+
     fun onMessageTextChange(text: String) {
         _messageText.value = text
     }

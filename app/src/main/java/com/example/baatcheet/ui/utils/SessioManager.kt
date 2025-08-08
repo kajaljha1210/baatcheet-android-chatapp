@@ -27,7 +27,7 @@ object SessionManager {
     private val KEY_UID = stringPreferencesKey("user_uid")
     private val KEY_PROFILE_DONE = booleanPreferencesKey("is_profile_done")
 
-    suspend fun setLogin(context: Context, isLoggedIn: Boolean, phone: String) {
+     suspend fun setLogin(context: Context, isLoggedIn: Boolean, phone: String) {
         Log.d(TAG, "🛠 setLogin() called with phone=$phone, isLoggedIn=$isLoggedIn")
         val existingUid = generateRandomUid()
         context.dataStore.edit { prefs ->

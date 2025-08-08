@@ -20,8 +20,10 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,8 +37,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.baatcheet.R
+import com.example.baatcheet.data.model.UserPresence
 import com.example.baatcheet.ui.components.AppText
 import com.example.baatcheet.ui.components.ChatListItem
 import com.example.baatcheet.ui.components.ChatSearchBar
@@ -61,6 +67,7 @@ fun ChatListScreen(
 
 
     val chatList by viewModel.chatList.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) {
         uid = SessionManager.getUid(context).first()
@@ -69,7 +76,46 @@ fun ChatListScreen(
         }
     }
 
+    uid?.let { userId ->
+        val presence by viewModel.getPresence(userId).collectAsState(
+            initial = UserPresence()
+        )
 
+        if (presence.isOnline) {
+            Text("Online", color = Color.Green)
+        } else {
+            Text("Last seen: ${presence.lastSeen}", color = Color.Gray)
+        }
+    }
+
+// ✅ Lifecycle observer (runs only when uid is not null)
+    uid?.let { userId ->
+        DisposableEffect(lifecycleOwner, userId) {
+            val observer = LifecycleEventObserver { _, event ->
+                when (event) {
+                    Lifecycle.Event.ON_START -> viewModel.goOnline(userId)
+                    Lifecycle.Event.ON_STOP -> viewModel.goOffline(userId)
+                    else -> {}
+                }
+            }
+
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+
+        // ✅ Presence UI
+        val presence by viewModel.getPresence(userId).collectAsState(
+            initial = UserPresence()
+        )
+
+        if (presence.isOnline) {
+            Text("Online", color = Color.Green)
+        } else {
+            Text("Last seen: ${presence.lastSeen}", color = Color.Gray)
+        }
+    }
     // BackHandler runs immediately on back press
     BackHandler {
         if (backPressedOnce) {
